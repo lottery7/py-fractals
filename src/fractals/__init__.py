@@ -1,6 +1,6 @@
-from .burning_ship2d import BurningShip2D
-from .julia2d import Julia2D
-from .mandelbrot2d import Mandelbrot2D
+from .burning_ship_2d import BurningShip2D
+from .julia_2d import Julia2D
+from .mandelbrot_2d import Mandelbrot2D
 
 __all__ = [
     "BurningShip2D",

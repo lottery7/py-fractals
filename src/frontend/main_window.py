@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(stylesheet.read())
 
         self._tabs = QTabWidget()
-        self._tabs.setMinimumWidth(200)
+        self._tabs.setMinimumWidth(220)
         self._tabs.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         self._create_fractal_tab()

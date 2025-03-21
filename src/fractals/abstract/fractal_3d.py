@@ -2,23 +2,27 @@ from typing import Any
 
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QCursor, QMouseEvent, QWheelEvent
-from PySide6.QtWidgets import QColorDialog
 
 from frontend.components import ColoredButton, NamedCheckBox, NamedSlider
 from frontend.constants import get_color
 from util import rotate_point, use_setter
 
-from .fragment_only_fractal import FragmentOnlyFractal
-from .screenshotable_fractal import ScreenshotableFractal
+from .fractal_abc import FractalABC
 
-__all__ = ["Fractal2D"]
+__all__ = ["Fractal3D"]
 
 
-class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
-    def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(fragment_shader_path, *args, **kwargs)
+class Fractal3D(FractalABC):
+    def __init__(
+        self,
+        fragment_shader_path: str,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
 
         self._max_iter = 100
+        self._fragment_shader_path = fragment_shader_path
         self._offset = QPointF(0.0, 0.0)
         self._zoom_factor = 1.0
         self._color = QColor(255, 255, 255, 255)
@@ -92,7 +96,7 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
         self.update()
 
     def fractal_controls(self) -> list[Any]:
-        return ScreenshotableFractal.fractal_controls(self) + [
+        return super().fractal_controls() + [
             ColoredButton(
                 name="Choose color",
                 color=get_color("blue"),
@@ -130,6 +134,10 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
 
     def _load_state(self, state: dict) -> None:
         raise RuntimeError()
+
+    def _fragment_shader_code(self) -> str:
+        with open(self._fragment_shader_path) as fragment_shader_file:
+            return fragment_shader_file.read()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         match (event.buttons()):
@@ -187,3 +195,45 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
         picker.setCurrentColor(self.color)
         picker.currentColorChanged.connect(lambda color: use_setter(self, "color", color))
         picker.exec()
+
+    # def eventFilter(self, source, event):
+    #     if event.type() == QEvent.MouseMove:
+    #         if event.buttons() == Qt.LeftButton:
+    #             self.draw = True
+    #             old_pos = self.mouse_position
+    #             new_pos = self._get_mouse_position()
+    #             difference = new_pos - old_pos
+    #             self.settings["PHI"] -= difference.x() / 100
+    #             self.settings["THETA"] -= difference.y() / 100
+    #             self.mouse_position = new_pos
+
+    #     elif event.type() == QEvent.MouseButtonPress:
+    #         if event.buttons() == Qt.LeftButton:
+    #             self.mouse_position = self._get_mouse_position()
+    #             self.setCursor(QCursor(Qt.ClosedHandCursor))
+
+    #     elif event.type() == QEvent.MouseButtonRelease:
+    #         self.unsetCursor()
+
+    #     elif event.type() == QEvent.Wheel:
+    #         self.draw = True
+    #         self.settings["ZOOM"] /= 1.01 ** (event.angleDelta().y() / 100)
+    #     elif event.type() == QEvent.KeyRelease:
+    #         if event.key() == Qt.Key_Escape:
+    #             dlg = QMessageBox(self)
+    #             dlg.setWindowTitle("Info")
+    #             dlg.setIcon(QMessageBox.Question)
+    #             yes_btn = dlg.addButton(QMessageBox.Yes)
+    #             dlg.addButton(QMessageBox.Cancel)
+    #             dlg.setText(f"Are you sure you want to exit?")
+    #             dlg.setStyleSheet(
+    #                 """QLabel{height: 30px; min-height: 30px; max-height: 30px;
+    #                                                          width: 300px; min-width:300px; max-width:300px;}"""
+    #             )
+    #             dlg.exec_()
+    #             if dlg.clickedButton() == yes_btn:
+    #                 quit(-1)
+    #     else:
+    #         return False
+
+    #     return True

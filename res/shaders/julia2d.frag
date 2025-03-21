@@ -1,20 +1,20 @@
-#version 120
+#version 430
 
 #define PI 3.141592654
 
 uniform int MAX_ITER;
 uniform vec2 RES;
-uniform vec2 OFFSET;
-uniform float ZOOM;
+uniform dvec2 OFFSET;
+uniform double ZOOM;
 uniform int DRAW_LINES;
-uniform vec2 C;
+uniform dvec2 C;
 uniform float PHI;
 uniform vec4 COLOR;
 uniform float POWER;
 uniform int AA;
 
-vec2 zsqr(vec2 z) { return vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y); }
-vec2 zmul(vec2 a, vec2 b) { return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x); }
+dvec2 zsqr(dvec2 z) { return dvec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y); }
+dvec2 zmul(dvec2 a, dvec2 b) { return dvec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x); }
 vec2 zdiv(vec2 a, vec2 b)
 {
 	float real = (a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y);
@@ -34,7 +34,7 @@ vec3 apply_color(float i)
 float compute(vec2 frag_coord)
 {
 	// Computing z value
-	vec2 z = 2.0 * frag_coord - RES.xy;
+	dvec2 z = 2.0 * frag_coord - RES.xy;
 	z = z / min(RES.x, RES.y) / ZOOM + OFFSET;
 	mat2 rot = mat2(cos(PI*PHI), -sin(PI*PHI), sin(PI*PHI), cos(PI*PHI));
 	z = rot*(z-OFFSET) + OFFSET;
@@ -44,7 +44,7 @@ float compute(vec2 frag_coord)
 	const float lim = 512.0;
 	while (dot(z, z) < lim && ++i < MAX_ITER)
 	{
-		vec2 z0 = z;
+		dvec2 z0 = z;
 		for (int j = 1; j < POWER; j++)
 			z = zmul(z0, z);
 		z += C;

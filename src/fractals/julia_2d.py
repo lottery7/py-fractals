@@ -75,7 +75,7 @@ class Julia2D(Fractal2D):
         ]
 
     def motion_controls(self) -> list[Any]:
-        return super().motion_controls() + []
+        return []
 
     def paintGL(self) -> None:
         self.makeCurrent()
@@ -86,7 +86,7 @@ class Julia2D(Fractal2D):
 
         gl.glUniform1i(location("MAX_ITER"), self.max_iter)
         gl.glUniform2f(location("RES"), *self._widget_size)
-        gl.glUniform1f(location("ZOOM"), self.zoom_factor)
+        gl.glUniform1d(location("ZOOM"), self.zoom_factor)
         gl.glUniform1i(location("DRAW_LINES"), int(self.central_lines))
         gl.glUniform1f(location("PHI"), self.rotation_angle)
 
@@ -99,9 +99,9 @@ class Julia2D(Fractal2D):
         )
 
         gl.glUniform1f(location("POWER"), float(self.power))
-        gl.glUniform2f(location("OFFSET"), self.offset.x(), self.offset.y())
+        gl.glUniform2d(location("OFFSET"), self.offset.x(), self.offset.y())
         gl.glUniform1i(location("AA"), 2 if self.antialiasing else 1)
 
-        gl.glUniform2f(location("C"), self.cartesian_c.real, self.cartesian_c.imag)
+        gl.glUniform2d(location("C"), self.cartesian_c.real, self.cartesian_c.imag)
 
         gl.glDrawElements(gl.GL_TRIANGLES, 6, gl.GL_UNSIGNED_INT, None)
