@@ -18,7 +18,7 @@ uniform float AO_COEF;
 uniform int SHADOWS;
 uniform int AA;
 
-// Поворот вокруг оси X
+// Rotation around the X axis
 mat3 rotate_x(float theta) {
     float c = cos(theta);
     float s = sin(theta);
@@ -29,7 +29,7 @@ mat3 rotate_x(float theta) {
     );
 }
 
-// Поворот вокруг оси Y
+// Rotation around the Y axis
 mat3 rotate_y(float theta) {
     float c = cos(theta);
     float s = sin(theta);
@@ -40,7 +40,7 @@ mat3 rotate_y(float theta) {
     );
 }
 
-// Поворот вокруг оси Z
+// Rotation around the Z axis
 mat3 rotate_z(float theta) {
     float c = cos(theta);
     float s = sin(theta);
@@ -51,34 +51,34 @@ mat3 rotate_z(float theta) {
     );
 }
 
-// Функция расстояния для множества Мандельброта
+// Distance function for the Mandelbrot set
 float get_mandelbrot_distance(vec3 pos)
 {
-    vec3 c = pos.xzy; // Для правильного расположения
+    vec3 c = pos.xzy; // For proper orientation
     vec3 z = c;
     float dzmod = 1.0;
     float zmod = length(z);
 
     for (int i = 0; i < MAX_ITER; i++)
     {
-        // Вычисляем производную
+        // Calculate the derivative
         dzmod = POWER * pow(zmod, POWER-1.0) * dzmod + 1.0;
 
-        // Возведение в степень
+        // Power operation
         float r = zmod;
         float a = POWER*atan(z.y, z.x);
         float b = POWER*asin(z.z / r) + ROTATE_Y;
         z = c + pow(r, POWER) * vec3(cos(a)*cos(b), sin(a)*cos(b), sin(b));
 
-        // Вычисляем модуль
+        // Calculate the modulus
         zmod = length(z);
         if (zmod > 2.0)
             break;
     }
-    // Результирующее расстояние
+    // Resulting distance
     float dist = 0.5 * zmod / dzmod * log(zmod);
 
-    // Разрез
+    // Cut
     if (bool(CUT))
     dist = max(dist, pos.y);
 
@@ -86,7 +86,7 @@ float get_mandelbrot_distance(vec3 pos)
     
 }
 
-// Вычисляет расстояние до всех объектов и возвращает минимальное
+// Calculates the distance to all objects and returns the minimum
 float get_distance(vec3 position)
 {
     float mandelbrot_distance = get_mandelbrot_distance(position);
@@ -95,67 +95,67 @@ float get_distance(vec3 position)
     return dist;
 }
 
-// Функция "пускания" луча
+// Ray marching function
 float ray_march(vec3 ray_origin, vec3 ray_direction, out float ao)
 {
-    // Всё пройденное расстояние
+    // Total traveled distance
     float all_distance = 0.0;
-    // Текущая позиция
+    // Current position
     vec3 current_position = ray_origin;
 
-    // Цикл
+    // Loop
     int i;
     for (i = 0; i < MAX_STEPS; i++)
     {
-        // Расстояние от текущей позиции
+        // Distance from the current position
         float dist = get_distance(current_position);
         all_distance += dist;
-        // Минимальная погрешность расстояния
+        // Minimum distance error
         float min_dist = all_distance / (4.0*max(RES.x, RES.y));
-        if (dist < min_dist)  // Луч попал в объект
+        if (dist < min_dist) // Ray hit an object
         {
             ao = clamp(1.0 - float(i) / float(AO_COEF), 0.0, 1.0);
             return all_distance;
         }
-        if (all_distance > MAX_RAY_LENGTH)  // Луч ушёл слишком далеко
+        if (all_distance > MAX_RAY_LENGTH) // Ray went too far
             break;
-        // Сдвигаем текущую позицию
+        // Shift the current position
         current_position += dist * ray_direction;
     }
-    // Луч ушёл, ambient occlusion не нужен
+    // Ray missed, ambient occlusion is not needed
     ao = 1.0;
     return MAX_RAY_LENGTH;
 
 }
 
-// Функция, которая вычисляет нормаль в заданной точке
+// Function that calculates the normal at a given point
 vec3 get_normal(vec3 point)
 {
     // epsilon
     vec2 e = vec2(1.0,-1.0)*0.00001;
     return normalize( e.xyy*get_distance(point + e.xyy) +
-					  e.yyx*get_distance(point + e.yyx) +
-					  e.yxy*get_distance(point + e.yxy) +
-					  e.xxx*get_distance(point + e.xxx) );
+                     e.yyx*get_distance(point + e.yyx) +
+                     e.yxy*get_distance(point + e.yxy) +
+                     e.xxx*get_distance(point + e.xxx) );
 }
 
-// Возвращает цвет пикселя с учётом освещения
+// Returns the pixel color with lighting
 float get_light(vec3 position)
 {
-    // Источник света
+    // Light source
     vec3 light_source = vec3(-2.0, 3.0, 0.0);
-    // Направление света
+    // Light direction
     vec3 light_direction = normalize(light_source-position);
-    // Нормаль
+    // Normal
     vec3 normal = get_normal(position);
-    // Свет
+    // Light
     float light = clamp(dot(normal, light_direction), 0.0, 1.0);
-    // Если надо, то учитываем тень
+    // If shadows are enabled, consider them
     if (bool(SHADOWS) && dot(light_direction, normal) > 0)
     {
-        float t; // Временная переменная
+        float t; // Temporary variable
         float dist = ray_march(position + normal * 0.001, light_direction, t);
-        // Если между объектом и источником что-то есть, то затемняем
+        // If there's something between the object and the light source, darken it
         if (dist < length(light_source - position))
             light *= 0.3;
     }
@@ -164,36 +164,36 @@ float get_light(vec3 position)
 
 vec3 render(vec2 frag_coord)
 {
-    // Конечный цвет пикселя
+    // Final pixel color
     vec3 col;
-    // Масштабирование координаты пикселя
+    // Scale the pixel coordinate
     vec2 uv = (frag_coord - 0.5*RES) / min(RES.y, RES.x);
-    // Направление взгляда
+    // View direction
     vec3 ray_direction = normalize(vec3(uv, -1.0));
     mat3 RT = rotate_x(THETA)*rotate_y(PHI);
     ray_direction *= RT;
-    // Местоположение
+    // Location
     vec3 ray_origin = vec3(0, 0, ZOOM) * RT;
 
     // Ambient occlusion
     float ao;
-    // Расстояние до объекта
+    // Distance to the object
     float dist = ray_march(ray_origin, ray_direction, ao);
 
-    if (dist < MAX_RAY_LENGTH)  // Луч попал в объект
+    if (dist < MAX_RAY_LENGTH) // Ray hit an object
     {
-        // Местоположение точки, куда попал луч
+        // Location of the point where the ray hit
         vec3 position = ray_origin + ray_direction * dist;
-        // Цвет пикселя с учётом освещения
+        // Pixel color with lighting
         dist = get_light(position);
-        // Покраска в выбранный цвет
+        // Paint in the selected color
         col = mix(vec3(dist), vec3(COLOR), 0.5);
-        // Применяем ambient occlusion
+        // Apply ambient occlusion
         col *= ao*ao*ao;
     }
-    else  // Луч не попал в объект
+    else // Ray missed the object
     {
-        // Красим в цвет неба
+        // Paint in the sky color
         col = vec3(BG_COLOR);
     }
     return col;
@@ -206,17 +206,6 @@ void main()
     for (int i = 0; i < AA; i++)
         col += render(gl_FragCoord.xy + vec2(i,j) / float(AA));
     col /= float(AA*AA);
-    // Присваиваем цвет пикселя
+    // Assign pixel color
     gl_FragColor = vec4(col, 1.0);
 }
-
-
-
-
-
-
-
-
-
-
-

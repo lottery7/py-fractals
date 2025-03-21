@@ -7,12 +7,12 @@ from PySide6.QtCore import QPointF
 from frontend.components import NamedSlider
 from util import use_setter
 
-from .abstract.fractal_2d import Fractal2D
+from .abstract import AAFractal, ColorableFractal, Fractal2D, IterableFractal
 
 
-class Julia2D(Fractal2D):
+class Julia2D(AAFractal, IterableFractal, ColorableFractal, Fractal2D):
     def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(fragment_shader_path, *args, **kwargs)
+        super().__init__(100, fragment_shader_path, *args, **kwargs)
 
         self._C_polar = QPointF(pi, 0.7)
         self._power = 2.0
@@ -53,26 +53,33 @@ class Julia2D(Fractal2D):
         return "Julia 2D"
 
     def fractal_controls(self) -> list[Any]:
-        return super().fractal_controls() + [
-            NamedSlider(
-                name="Arg(C)",
-                scope=(0, 10_000),
-                initial=self.arg_c * 5000 / pi,
-                handlers=[lambda value: use_setter(self, "arg_c", value / 5000 * pi)],
-            ),
-            NamedSlider(
-                name="Abs(C)",
-                scope=(0, 10_000),
-                initial=self.abs_c * 5000,
-                handlers=[lambda value: use_setter(self, "abs_c", value / 5000)],
-            ),
-            NamedSlider(
-                name="Power",
-                scope=(2, 10),
-                initial=self.power,
-                handlers=[lambda value: use_setter(self, "power", value)],
-            ),
-        ]
+
+        return (
+            Fractal2D.fractal_controls(self)
+            + ColorableFractal.fractal_controls(self)
+            + AAFractal.fractal_controls(self)
+            + IterableFractal.fractal_controls(self)
+            + [
+                NamedSlider(
+                    name="Arg(C)",
+                    scope=(0, 10_000),
+                    initial=self.arg_c * 5000 / pi,
+                    handlers=[lambda value: use_setter(self, "arg_c", value / 5000 * pi)],
+                ),
+                NamedSlider(
+                    name="Abs(C)",
+                    scope=(0, 10_000),
+                    initial=self.abs_c * 5000,
+                    handlers=[lambda value: use_setter(self, "abs_c", value / 5000)],
+                ),
+                NamedSlider(
+                    name="Power",
+                    scope=(2, 10),
+                    initial=self.power,
+                    handlers=[lambda value: use_setter(self, "power", value)],
+                ),
+            ]
+        )
 
     def motion_controls(self) -> list[Any]:
         return []

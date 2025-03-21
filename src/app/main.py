@@ -19,6 +19,7 @@ def main():
         Julia2D(fragment_shader_path="res/shaders/julia2d.frag"),
         Mandelbrot2D(fragment_shader_path="res/shaders/mandelbrot2d.frag"),
         BurningShip2D(fragment_shader_path="res/shaders/burningship2d.frag"),
+        Mandelbrot3D(fragment_shader_path="res/shaders/mandelbrot3d.frag"),
     ]
 
     window = MainWindow()

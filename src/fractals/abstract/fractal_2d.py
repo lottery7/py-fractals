@@ -1,11 +1,9 @@
 from typing import Any
 
 from PySide6.QtCore import QPointF, Qt
-from PySide6.QtGui import QColor, QCursor, QMouseEvent, QWheelEvent
-from PySide6.QtWidgets import QColorDialog
+from PySide6.QtGui import QCursor, QMouseEvent, QWheelEvent
 
-from frontend.components import ColoredButton, NamedCheckBox, NamedSlider
-from frontend.constants import get_color
+from frontend.components import NamedCheckBox, NamedSlider
 from util import rotate_point, use_setter
 
 from .fragment_only_fractal import FragmentOnlyFractal
@@ -18,24 +16,12 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
     def __init__(self, fragment_shader_path: str, *args, **kwargs):
         super().__init__(fragment_shader_path, *args, **kwargs)
 
-        self._max_iter = 100
         self._offset = QPointF(0.0, 0.0)
         self._zoom_factor = 1.0
-        self._color = QColor(255, 255, 255, 255)
         self._central_lines = False
-        self._enable_AA = False
         self._rotation_angle = 0.0
 
         self._last_mouse_pos = self._current_mouse_pos
-
-    @property
-    def max_iter(self) -> int:
-        return self._max_iter
-
-    @max_iter.setter
-    def max_iter(self, new_value: int) -> None:
-        self._max_iter = new_value
-        self.update()
 
     @property
     def rotation_angle(self) -> float:
@@ -73,37 +59,8 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
         self._zoom_factor = new_value
         self.update()
 
-    @property
-    def antialiasing(self) -> bool:
-        return self._enable_AA
-
-    @antialiasing.setter
-    def antialiasing(self, new_value: bool) -> None:
-        self._enable_AA = new_value
-        self.update()
-
-    @property
-    def color(self) -> QColor:
-        return self._color
-
-    @color.setter
-    def color(self, new_value: QColor) -> None:
-        self._color = new_value
-        self.update()
-
     def fractal_controls(self) -> list[Any]:
         return ScreenshotableFractal.fractal_controls(self) + [
-            ColoredButton(
-                name="Choose color",
-                color=get_color("blue"),
-                handlers=[self._show_color_picker],
-            ),
-            NamedSlider(
-                name="Iterations Limit",
-                scope=(0, 500),
-                initial=self.max_iter,
-                handlers=[lambda value: use_setter(self, "max_iter", value)],
-            ),
             NamedSlider(
                 name="Rotation Angle",
                 scope=(-5000, 5000),
@@ -114,11 +71,6 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
                 name="Central Lines",
                 initial=self.central_lines,
                 handlers=[lambda value: use_setter(self, "central_lines", value)],
-            ),
-            NamedCheckBox(
-                name="Antialiasing",
-                initial=self.antialiasing,
-                handlers=[lambda value: use_setter(self, "antialiasing", value)],
             ),
         ]
 
@@ -180,10 +132,3 @@ class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
         point.setY(-point.y())
 
         return point
-
-    def _show_color_picker(self) -> None:
-        picker = QColorDialog(self)
-        picker.setStyleSheet("QSpinBox { min-width: 50px; max-width: 50px; }")
-        picker.setCurrentColor(self.color)
-        picker.currentColorChanged.connect(lambda color: use_setter(self, "color", color))
-        picker.exec()

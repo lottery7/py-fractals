@@ -75,6 +75,8 @@ class MainWindow(QMainWindow):
             QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         )
 
+        self._fractal_tab.verticalScrollBar().setValue(0)
+
         fractal.update()
 
     def _create_fractal_tab(self) -> None:
@@ -87,11 +89,11 @@ class MainWindow(QMainWindow):
         self._fractal_controls = VStackWidget()
         self._fractal_controls.add(self._fractals_list)
 
-        tab = QScrollArea()
-        tab.setWidgetResizable(True)
-        tab.setWidget(self._fractal_controls)
+        self._fractal_tab = QScrollArea()
+        self._fractal_tab.setWidgetResizable(True)
+        self._fractal_tab.setWidget(self._fractal_controls)
 
-        self._tabs.addTab(tab, "Fractal")
+        self._tabs.addTab(self._fractal_tab, "Fractal")
 
     def _create_motion_tab(self) -> None:
         self._motion_controls = VStackWidget()

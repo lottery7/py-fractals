@@ -2,17 +2,16 @@ from math import cos, pi, sin
 from typing import Any
 
 import OpenGL.GL as gl
-from PySide6.QtCore import QPointF
 
 from frontend.components import NamedSlider
 from util import use_setter
 
-from .abstract.fractal_2d import Fractal2D
+from .abstract import AAFractal, ColorableFractal, Fractal2D, IterableFractal
 
 
-class BurningShip2D(Fractal2D):
+class BurningShip2D(AAFractal, IterableFractal, ColorableFractal, Fractal2D):
     def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(fragment_shader_path, *args, **kwargs)
+        super().__init__(100, fragment_shader_path, *args, **kwargs)
 
         self._power = 2.0
 
@@ -29,14 +28,20 @@ class BurningShip2D(Fractal2D):
         return "Burning Ship 2D"
 
     def fractal_controls(self) -> list[Any]:
-        return super().fractal_controls() + [
-            NamedSlider(
-                name="Power",
-                scope=(2, 10),
-                initial=self.power,
-                handlers=[lambda value: use_setter(self, "power", value)],
-            ),
-        ]
+        return (
+            Fractal2D.fractal_controls(self)
+            + ColorableFractal.fractal_controls(self)
+            + AAFractal.fractal_controls(self)
+            + IterableFractal.fractal_controls(self)
+            + [
+                NamedSlider(
+                    name="Power",
+                    scope=(2, 10),
+                    initial=self.power,
+                    handlers=[lambda value: use_setter(self, "power", value)],
+                ),
+            ]
+        )
 
     def motion_controls(self) -> list[Any]:
         return super().motion_controls() + []
