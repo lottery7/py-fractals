@@ -23,6 +23,7 @@ def main():
         Julia3D(name="Julia 3D Polar", fragment_shader_path="res/shaders/julia3d.frag"),
         Mandelbrot3D(name="Mandelbrot 3D Quaternion", fragment_shader_path="res/shaders/mandelbrot4d.frag"),
         Julia3D(name="Julia 3D Quaternion", fragment_shader_path="res/shaders/julia4d.frag"),
+        Mandelbox(name="Mandelbox", fragment_shader_path="res/shaders/mandelbox.frag"),
     ]
 
     window = MainWindow()
