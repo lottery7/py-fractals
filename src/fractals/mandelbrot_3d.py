@@ -1,3 +1,4 @@
+import json
 from math import pi
 from typing import Any
 
@@ -13,10 +14,11 @@ from .abstract import (
     ColorableFractal,
     Fractal3D,
     IterableFractal,
+    StatefulFractal,
 )
 
 
-class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
+class Mandelbrot3D(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
     def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
         super().__init__(10, name, fragment_shader_path, *args, **kwargs)
 
@@ -83,7 +85,8 @@ class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFrac
 
     def fractal_controls(self) -> list[Any]:
         return (
-            Fractal3D.fractal_controls(self)
+            StatefulFractal.fractal_controls(self)
+            + Fractal3D.fractal_controls(self)
             + ColorableFractal.fractal_controls(self)
             + BGColorableFractal.fractal_controls(self)
             + AAFractal.fractal_controls(self)
@@ -169,3 +172,62 @@ class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFrac
         gl.glUniform1i(location("SHADOWS"), int(self.shadows))
 
         gl.glDrawElements(gl.GL_TRIANGLES, 6, gl.GL_UNSIGNED_INT, None)
+
+    def _save_state(self, filename: str) -> None:
+        state = {
+            "max_iter": self.max_iter,
+            "zoom_factor": self.zoom_factor,
+            "h_angle": self.h_angle,
+            "v_angle": self.v_angle,
+            "color": {
+                "red": self.color.redF(),
+                "green": self.color.greenF(),
+                "blue": self.color.blueF(),
+                "alpha": self.color.alphaF(),
+            },
+            "power": self.power,
+            "antialiasing": self.antialiasing,
+            "bg_color": {
+                "red": self.bg_color.redF(),
+                "green": self.bg_color.greenF(),
+                "blue": self.bg_color.blueF(),
+                "alpha": self.bg_color.alphaF(),
+            },
+            "cut": self.cut,
+            "depth": self.depth,
+            "z_angle": self.z_angle,
+            "ao": self.ao,
+            "shadows": self.shadows,
+        }
+        with open(filename, "w") as f:
+            json.dump(state, f)
+
+    def _load_state(self, filename: str) -> None:
+        with open(filename, "r") as f:
+            state = json.load(f)
+
+        self.max_iter = state["max_iter"]
+        self.zoom_factor = state["zoom_factor"]
+        self.h_angle = state["h_angle"]
+        self.v_angle = state["v_angle"]
+
+        self.color.setRedF(state["color"]["red"])
+        self.color.setGreenF(state["color"]["green"])
+        self.color.setBlueF(state["color"]["blue"])
+        self.color.setAlphaF(state["color"]["alpha"])
+
+        self.power = state["power"]
+        self.antialiasing = state["antialiasing"]
+
+        self.bg_color.setRedF(state["bg_color"]["red"])
+        self.bg_color.setGreenF(state["bg_color"]["green"])
+        self.bg_color.setBlueF(state["bg_color"]["blue"])
+        self.bg_color.setAlphaF(state["bg_color"]["alpha"])
+
+        self.cut = state["cut"]
+        self.depth = state["depth"]
+        self.z_angle = state["z_angle"]
+        self.ao = state["ao"]
+        self.shadows = state["shadows"]
+
+        self.update()

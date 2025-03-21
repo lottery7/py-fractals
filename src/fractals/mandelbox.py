@@ -1,3 +1,4 @@
+import json
 from math import cos, pi, sin
 from typing import Any
 
@@ -15,10 +16,11 @@ from .abstract import (
     ColorableFractal,
     Fractal3D,
     IterableFractal,
+    StatefulFractal,
 )
 
 
-class Mandelbox(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
+class Mandelbox(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
     def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
         super().__init__(20, name, fragment_shader_path, *args, **kwargs)
 
@@ -259,7 +261,8 @@ class Mandelbox(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal
 
     def fractal_controls(self) -> list[Any]:
         return (
-            Fractal3D.fractal_controls(self)
+            StatefulFractal.fractal_controls(self)
+            + Fractal3D.fractal_controls(self)
             + ColorableFractal.fractal_controls(self)
             + BGColorableFractal.fractal_controls(self)
             + AAFractal.fractal_controls(self)
@@ -317,3 +320,65 @@ class Mandelbox(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal
 
     def motion_controls(self) -> list[Any]:
         return []
+
+    def _save_state(self, filename: str) -> None:
+        state = {
+            "max_iter": self.max_iter,
+            "h_angle": self.h_angle,
+            "v_angle": self.v_angle,
+            "offset": self.offset,
+            "bg_color": {
+                "red": self.bg_color.redF(),
+                "green": self.bg_color.greenF(),
+                "blue": self.bg_color.blueF(),
+                "alpha": self.bg_color.alphaF(),
+            },
+            "color": {
+                "red": self.color.redF(),
+                "green": self.color.greenF(),
+                "blue": self.color.blueF(),
+                "alpha": self.color.alphaF(),
+            },
+            "depth": self.depth,
+            "ao": self.ao,
+            "shadows": self.shadows,
+            "folding": self.folding,
+            "scale": self.scale,
+            "out_rad": self.out_rad,
+            "in_rad": self.in_rad,
+            "antialiasing": self.antialiasing,
+            "speed": self.speed,
+        }
+        with open(filename, "w") as f:
+            json.dump(state, f)
+
+    def _load_state(self, filename: str) -> None:
+        with open(filename, "r") as f:
+            state = json.load(f)
+
+        self.max_iter = state["max_iter"]
+        self.h_angle = state["h_angle"]
+        self.v_angle = state["v_angle"]
+        self.offset = state["offset"]
+
+        self.bg_color.setRedF(state["bg_color"]["red"])
+        self.bg_color.setGreenF(state["bg_color"]["green"])
+        self.bg_color.setBlueF(state["bg_color"]["blue"])
+        self.bg_color.setAlphaF(state["bg_color"]["alpha"])
+
+        self.color.setRedF(state["color"]["red"])
+        self.color.setGreenF(state["color"]["green"])
+        self.color.setBlueF(state["color"]["blue"])
+        self.color.setAlphaF(state["color"]["alpha"])
+
+        self.depth = state["depth"]
+        self.ao = state["ao"]
+        self.shadows = state["shadows"]
+        self.folding = state["folding"]
+        self.scale = state["scale"]
+        self.out_rad = state["out_rad"]
+        self.in_rad = state["in_rad"]
+        self.antialiasing = state["antialiasing"]
+        self.speed = state["speed"]
+
+        self.update()
