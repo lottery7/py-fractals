@@ -23,7 +23,7 @@ uniform int AA;
 float OUT_RAD_SQR = OUT_RAD * OUT_RAD;
 float IN_RAD_SQR = IN_RAD * IN_RAD;
 
-// Поворот вокруг оси X
+// Rotation around the X axis
 mat3 rotate_x(float theta) {
     float c = cos(theta);
     float s = sin(theta);
@@ -34,7 +34,7 @@ mat3 rotate_x(float theta) {
     );
 }
 
-// Поворот вокруг оси Y
+// Rotation around the Y axis
 mat3 rotate_y(float theta) {
     float c = cos(theta);
     float s = sin(theta);
@@ -45,7 +45,7 @@ mat3 rotate_y(float theta) {
     );
 }
 
-// Поворот вокруг оси Z
+// Rotation around the Z axis
 mat3 rotate_z(float theta) {
     float c = cos(theta);
     float s = sin(theta);
@@ -58,14 +58,14 @@ mat3 rotate_z(float theta) {
 
 float get_mandelbox_distance(vec3 pos)
 {
-	vec3 offset = pos;
+    vec3 offset = pos;
     vec3 z = offset;
-	float dz = 1.0;
-	for (int i = 0; i < MAX_ITER; i++)
+    float dz = 1.0;
+    for (int i = 0; i < MAX_ITER; i++)
     {
         z = clamp(z, -FOLDING, FOLDING) * 2.0 - z;
 
-		float zdot = dot(z,z);
+        float zdot = dot(z,z);
         if (zdot < IN_RAD_SQR)
         {
             float temp = OUT_RAD_SQR / IN_RAD_SQR;
@@ -81,80 +81,80 @@ float get_mandelbox_distance(vec3 pos)
 
         z = SCALE * z + offset;
         dz = dz * abs(SCALE) + 1.0;
-	}
-	float r = length(z);
-	return r / abs(dz);
+    }
+    float r = length(z);
+    return r / abs(dz);
 }
 
-// Вычисляет расстояние до всех объектов и возвращает минимальное
+// Calculates the distance to all objects and returns the minimum
 float get_distance(vec3 position)
 {
-//    position = mod(position - 0.5*OFF, OFF) - 0.5*OFF;
+//  position = mod(position - 0.5*OFF, OFF) - 0.5*OFF;
     float dist = get_mandelbox_distance(position);
     return dist;
 }
 
-// Функция "пускания" луча
+// Ray "launching" function
 float ray_march(vec3 ray_origin, vec3 ray_direction, out float ao)
 {
-    // Всё пройденное расстояние
+    // Total traveled distance
     float all_distance = 0.0;
-    // Текущая позиция
+    // Current position
     vec3 current_position = ray_origin;
 
-    // Цикл
+    // Loop
     int i;
     for (i = 0; i < MAX_STEPS; i++)
     {
-        // Расстояние от текущей позиции
+        // Distance from the current position
         float dist = get_distance(current_position);
         all_distance += dist;
-        // Минимальная погрешность расстояния
+        // Minimum distance error
         float min_dist = all_distance / (4.0*max(RES.x, RES.y));
-        if (dist < min_dist)  // Луч попал в объект
+        if (dist < min_dist)  // Ray hit the object
         {
             ao = clamp(1.0 - float(i) / float(AO_COEF), 0.0, 1.0);
             return all_distance;
         }
-        if (all_distance > MAX_RAY_LENGTH)  // Луч ушёл слишком далеко
+        if (all_distance > MAX_RAY_LENGTH)  // Ray went too far
             break;
-        // Сдвигаем текущую позицию
+        // Shift the current position
         current_position += dist * ray_direction;
     }
-    // Луч ушёл, ambient occlusion не нужен
+    // Ray went away, ambient occlusion is not needed
     ao = 1.0;
     return MAX_RAY_LENGTH;
 
 }
 
-// Функция, которая вычисляет нормаль в заданной точке
+// Function that calculates the normal at a given point
 vec3 get_normal(vec3 point)
 {
     // epsilon
     vec2 e = vec2(1.0,-1.0)*0.00001;
     return normalize( e.xyy*get_distance(point + e.xyy) +
-					  e.yyx*get_distance(point + e.yyx) +
-					  e.yxy*get_distance(point + e.yxy) +
-					  e.xxx*get_distance(point + e.xxx) );
+                     e.yyx*get_distance(point + e.yyx) +
+                     e.yxy*get_distance(point + e.yxy) +
+                     e.xxx*get_distance(point + e.xxx) );
 }
 
-// Возвращает цвет пикселя с учётом освещения
+// Returns the pixel color taking into account lighting
 float get_light(vec3 position)
 {
-    // Источник света
+    // Light source
     vec3 light_source = vec3(0, 50, 50);
-    // Направление света
+    // Light direction
     vec3 light_direction = normalize(light_source-position);
-    // Нормаль
+    // Normal
     vec3 normal = get_normal(position);
-    // Свет
+    // Light
     float light = clamp(dot(normal, light_direction), 0.0, 1.0);
-    // Если надо, то учитываем тень
+    // If necessary, take into account the shadow
     if (bool(SHADOWS))
     {
-        float t; // Временная переменная
+        float t; // Temporary variable
         float dist = ray_march(position + normal * 0.001, light_direction, t);
-        // Если между объектом и источником что-то есть, то затемняем
+        // If there is something between the object and the source, then darken
         if (dist < length(light_source - position))
             light *= 0.3;
     }
@@ -163,36 +163,36 @@ float get_light(vec3 position)
 
 vec3 render(vec2 frag_coord)
 {
-    // Конечный цвет пикселя
+    // Final pixel color
     vec3 col;
-    // Масштабирование координаты пикселя
+    // Scaling the pixel coordinate
     vec2 uv = (frag_coord - 0.5*RES) / min(RES.y, RES.x);
-    // Направление взгляда
+    // View direction
     vec3 ray_direction = normalize(vec3(uv, -1.0));
     mat3 RT = rotate_x(THETA)*rotate_y(PHI);
     ray_direction *= RT;
-    // Местоположение
+    // Location
     vec3 ray_origin = OFFSET;
 
     // Ambient occlusion
     float ao;
-    // Расстояние до объекта
+    // Distance to the object
     float dist = ray_march(ray_origin, ray_direction, ao);
 
-    if (dist < MAX_RAY_LENGTH)  // Луч попал в объект
+    if (dist < MAX_RAY_LENGTH)  // Ray hit the object
     {
-        // Местоположение точки, куда попал луч
+        // Location of the point where the ray hit
         vec3 position = ray_origin + ray_direction * dist;
-        // Цвет пикселя с учётом освещения
+        // Pixel color taking into account lighting
         dist = get_light(position);
-        // Покраска в выбранный цвет
+        // Painting in the selected color
         col = mix(vec3(dist), vec3(COLOR), 0.5);
-        // Применяем ambient occlusion
+        // Apply ambient occlusion
         col *= ao*ao*ao;
     }
-    else  // Луч не попал в объект
+    else  // Ray did not hit the object
     {
-        // Красим в цвет неба
+        // Paint in the sky color
         col = BG_COLOR.xyz;
     }
     return col;
@@ -206,17 +206,6 @@ void main()
         col += render(gl_FragCoord.xy + vec2(i, j) / float(AA));
     col /= float(AA*AA);
 
-    // Присваиваем вычисленный цвет пикселю
+    // Assign the calculated color to the pixel
     gl_FragColor = vec4(col, 1.0);
 }
-
-
-
-
-
-
-
-
-
-
-
