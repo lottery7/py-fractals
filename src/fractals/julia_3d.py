@@ -18,8 +18,8 @@ from .abstract import (
 
 
 class Julia3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
-    def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(7, fragment_shader_path, *args, **kwargs)
+    def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
+        super().__init__(7, name, fragment_shader_path, *args, **kwargs)
 
         self._abs_c = 0.8776
         self._argx_c = 2.0
@@ -111,9 +111,6 @@ class Julia3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, 
     def rotate_y(self, new_value: float) -> None:
         self._rotate_y = new_value
         self.update()
-
-    def name(self) -> str:
-        return "Julia 3D Polar"
 
     def fractal_controls(self) -> list[Any]:
         return (

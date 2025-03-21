@@ -15,13 +15,10 @@ class _ABCQOpenGLWidgetMeta(type(QOpenGLWidget), ABCMeta):
 
 
 class FractalABC(ABC, QOpenGLWidget, metaclass=_ABCQOpenGLWidgetMeta):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-
-    @abstractmethod
-    def name(self) -> str:
-        pass
+        self._name = name
 
     @abstractmethod
     def fractal_controls(self) -> list[Any]:
@@ -60,3 +57,7 @@ class FractalABC(ABC, QOpenGLWidget, metaclass=_ABCQOpenGLWidgetMeta):
         width = ceil(self.width() * pixel_ratio)
         height = ceil(self.height() * pixel_ratio)
         return (width, height)
+
+    @property
+    def name(self) -> str:
+        return self._name

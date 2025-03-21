@@ -11,8 +11,8 @@ from .abstract import AAFractal, ColorableFractal, Fractal2D, IterableFractal
 
 
 class Mandelbrot2D(AAFractal, IterableFractal, ColorableFractal, Fractal2D):
-    def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(100, fragment_shader_path, *args, **kwargs)
+    def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
+        super().__init__(100, name, fragment_shader_path, *args, **kwargs)
 
         self._power = 2.0
 
@@ -48,9 +48,6 @@ class Mandelbrot2D(AAFractal, IterableFractal, ColorableFractal, Fractal2D):
     def perturbation(self, new_value: bool) -> None:
         self._perturbation = new_value
         self.update()
-
-    def name(self) -> str:
-        return "Mandelbrot 2D"
 
     def fractal_controls(self) -> list[Any]:
         return (

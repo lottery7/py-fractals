@@ -13,8 +13,8 @@ __all__ = ["Fractal2D"]
 
 
 class Fractal2D(FragmentOnlyFractal, ScreenshotableFractal):
-    def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(fragment_shader_path, *args, **kwargs)
+    def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
+        super().__init__(fragment_shader_path, name, *args, **kwargs)
 
         self._offset = QPointF(0.0, 0.0)
         self._zoom_factor = 1.0

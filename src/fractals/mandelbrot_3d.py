@@ -17,8 +17,8 @@ from .abstract import (
 
 
 class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
-    def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(10, fragment_shader_path, *args, **kwargs)
+    def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
+        super().__init__(10, name, fragment_shader_path, *args, **kwargs)
 
         self._power = 9.0
         self._z_angle = 0.0
@@ -80,9 +80,6 @@ class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFrac
     def ao(self, new_value: int) -> None:
         self._ao = new_value
         self.update()
-
-    def name(self) -> str:
-        return "Mandelbrot 3D Polar"
 
     def fractal_controls(self) -> list[Any]:
         return (

@@ -10,8 +10,8 @@ __all__ = ["Fractal3D"]
 
 
 class Fractal3D(FragmentOnlyFractal, ScreenshotableFractal):
-    def __init__(self, fragment_shader_path: str, *args, **kwargs):
-        super().__init__(fragment_shader_path, *args, **kwargs)
+    def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
+        super().__init__(fragment_shader_path, name, *args, **kwargs)
 
         self._h_angle = 0.0
         self._v_angle = 0.0

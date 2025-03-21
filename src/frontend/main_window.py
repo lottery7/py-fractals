@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         return [self._fractals_list.itemData(i) for i in range(self._fractals_list.count())]
 
     def register_fractal(self, fractal: FractalABC) -> None:
-        if fractal.name() in map(lambda f: f.name(), self._get_registered_fractals()):
+        if fractal.name in map(lambda f: f.name, self._get_registered_fractals()):
             raise RuntimeError(f"Fractal with name {fractal.name()} already registered")
 
-        self._fractals_list.addItem(fractal.name(), userData=fractal)
+        self._fractals_list.addItem(fractal.name, userData=fractal)

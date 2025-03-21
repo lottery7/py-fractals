@@ -16,11 +16,13 @@ def main():
     QSurfaceFormat.setDefaultFormat(format)
 
     fractals = [
-        Julia2D(fragment_shader_path="res/shaders/julia2d.frag"),
-        Mandelbrot2D(fragment_shader_path="res/shaders/mandelbrot2d.frag"),
-        BurningShip2D(fragment_shader_path="res/shaders/burningship2d.frag"),
-        Mandelbrot3D(fragment_shader_path="res/shaders/mandelbrot3d.frag"),
-        Julia3D(fragment_shader_path="res/shaders/julia3d.frag"),
+        Julia2D(name="Julia 2D", fragment_shader_path="res/shaders/julia2d.frag"),
+        Mandelbrot2D(name="Mandelbrot 2D", fragment_shader_path="res/shaders/mandelbrot2d.frag"),
+        BurningShip2D(name="Burning Ship", fragment_shader_path="res/shaders/burningship2d.frag"),
+        Mandelbrot3D(name="Mandelbrot 3D Polar", fragment_shader_path="res/shaders/mandelbrot3d.frag"),
+        Julia3D(name="Julia 3D Polar", fragment_shader_path="res/shaders/julia3d.frag"),
+        Mandelbrot3D(name="Mandelbrot 3D Quaternion", fragment_shader_path="res/shaders/mandelbrot4d.frag"),
+        Julia3D(name="Julia 3D Quaternion", fragment_shader_path="res/shaders/julia4d.frag"),
     ]
 
     window = MainWindow()
