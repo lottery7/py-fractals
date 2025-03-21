@@ -7,15 +7,20 @@ from PySide6.QtGui import QColor
 from frontend.components import NamedCheckBox, NamedSlider
 from util import use_setter
 
-from .abstract import AAFractal, ColorableFractal, Fractal3D, IterableFractal
+from .abstract import (
+    AAFractal,
+    BGColorableFractal,
+    ColorableFractal,
+    Fractal3D,
+    IterableFractal,
+)
 
 
-class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, Fractal3D):
+class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, BGColorableFractal, Fractal3D):
     def __init__(self, fragment_shader_path: str, *args, **kwargs):
         super().__init__(10, fragment_shader_path, *args, **kwargs)
 
         self._power = 9.0
-        self._bg_color = QColor(0, 0, 0)
         self._z_angle = 0.0
         self._cut = False
         self._shadows = True
@@ -83,6 +88,7 @@ class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, Fractal3D):
         return (
             Fractal3D.fractal_controls(self)
             + ColorableFractal.fractal_controls(self)
+            + BGColorableFractal.fractal_controls(self)
             + AAFractal.fractal_controls(self)
             + IterableFractal.fractal_controls(self)
             + [
@@ -152,10 +158,10 @@ class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, Fractal3D):
 
         gl.glUniform4f(
             location("BG_COLOR"),
-            self._bg_color.redF(),
-            self._bg_color.greenF(),
-            self._bg_color.blueF(),
-            self._bg_color.alphaF(),
+            self.bg_color.redF(),
+            self.bg_color.greenF(),
+            self.bg_color.blueF(),
+            self.bg_color.alphaF(),
         )
 
         gl.glUniform1i(location("CUT"), self.cut)
@@ -166,6 +172,3 @@ class Mandelbrot3D(AAFractal, IterableFractal, ColorableFractal, Fractal3D):
         gl.glUniform1i(location("SHADOWS"), int(self.shadows))
 
         gl.glDrawElements(gl.GL_TRIANGLES, 6, gl.GL_UNSIGNED_INT, None)
-
-
-#          "BG_COLOR": (0.1765, 0.1765, 0.1765, 1.0),

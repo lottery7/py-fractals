@@ -1,4 +1,5 @@
 from .AA_fractal import AAFractal
+from .bg_colorable_fractal import BGColorableFractal
 from .colorable_fractal import ColorableFractal
 from .fractal_2d import Fractal2D
 from .fractal_3d import Fractal3D
@@ -16,4 +17,5 @@ __all__ = [
     "FragmentOnlyFractal",
     "IterableFractal",
     "ScreenshotableFractal",
+    "BGColorableFractal",
 ]
