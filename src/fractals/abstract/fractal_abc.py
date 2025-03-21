@@ -29,14 +29,6 @@ class FractalABC(ABC, QOpenGLWidget, metaclass=_ABCQOpenGLWidgetMeta):
         pass
 
     @abstractmethod
-    def _current_state(self) -> dict:
-        pass
-
-    @abstractmethod
-    def _load_state(self, state: dict) -> None:
-        pass
-
-    @abstractmethod
     def paintGL(self) -> None:
         pass
 

@@ -7,6 +7,7 @@ from .fractal_abc import FractalABC
 from .fragment_only_fractal import FragmentOnlyFractal
 from .iterable_fractal import IterableFractal
 from .screenshotable_fractal import ScreenshotableFractal
+from .stateful_fractal import StatefulFractal
 
 __all__ = [
     "AAFractal",
@@ -18,4 +19,5 @@ __all__ = [
     "IterableFractal",
     "ScreenshotableFractal",
     "BGColorableFractal",
+    "StatefulFractal",
 ]

@@ -53,12 +53,6 @@ class Fractal3D(FragmentOnlyFractal, ScreenshotableFractal):
     def motion_controls(self) -> list[Any]:
         return []
 
-    def _current_state(self) -> dict:
-        raise RuntimeError()
-
-    def _load_state(self, state: dict) -> None:
-        raise RuntimeError()
-
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         match (event.buttons()):
             case Qt.MouseButton.LeftButton:

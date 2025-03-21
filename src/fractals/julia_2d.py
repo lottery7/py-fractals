@@ -1,3 +1,4 @@
+import json
 from math import cos, pi, sin
 from typing import Any
 
@@ -7,10 +8,16 @@ from PySide6.QtCore import QPointF
 from frontend.components import NamedSlider
 from util import use_setter
 
-from .abstract import AAFractal, ColorableFractal, Fractal2D, IterableFractal
+from .abstract import (
+    AAFractal,
+    ColorableFractal,
+    Fractal2D,
+    IterableFractal,
+    StatefulFractal,
+)
 
 
-class Julia2D(AAFractal, IterableFractal, ColorableFractal, Fractal2D):
+class Julia2D(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, Fractal2D):
     def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
         super().__init__(100, name, fragment_shader_path, *args, **kwargs)
 
@@ -49,10 +56,53 @@ class Julia2D(AAFractal, IterableFractal, ColorableFractal, Fractal2D):
         self._power = new_value
         self.update()
 
-    def fractal_controls(self) -> list[Any]:
+    def _save_state(self, filename: str) -> None:
+        state = {
+            "max_iter": self.max_iter,
+            "zoom_factor": self.zoom_factor,
+            "central_lines": self.central_lines,
+            "rotation_angle": self.rotation_angle,
+            "color": {
+                "red": self._color.redF(),
+                "green": self._color.greenF(),
+                "blue": self._color.blueF(),
+                "alpha": self._color.alphaF(),
+            },
+            "power": self.power,
+            "offset": {"x": self.offset.x(), "y": self.offset.y()},
+            "antialiasing": self.antialiasing,
+            "c_polar": {"arg": self.arg_c, "abs": self.abs_c},
+        }
+        with open(filename, "w") as f:
+            json.dump(state, f)
 
+    def _load_state(self, filename: str) -> None:
+        with open(filename, "r") as f:
+            state = json.load(f)
+
+        self.max_iter = state["max_iter"]
+        self.zoom_factor = state["zoom_factor"]
+        self.central_lines = state["central_lines"]
+        self.rotation_angle = state["rotation_angle"]
+
+        self.color.setRedF(state["color"]["red"])
+        self.color.setGreenF(state["color"]["green"])
+        self.color.setBlueF(state["color"]["blue"])
+        self.color.setAlphaF(state["color"]["alpha"])
+
+        self.power = state["power"]
+        self.offset = QPointF(state["offset"]["x"], state["offset"]["y"])
+        self.antialiasing = state["antialiasing"]
+
+        self.arg_c = state["c_polar"]["arg"]
+        self.abs_c = state["c_polar"]["abs"]
+
+        self.update()
+
+    def fractal_controls(self) -> list[Any]:
         return (
-            Fractal2D.fractal_controls(self)
+            StatefulFractal.fractal_controls(self)
+            + Fractal2D.fractal_controls(self)
             + ColorableFractal.fractal_controls(self)
             + AAFractal.fractal_controls(self)
             + IterableFractal.fractal_controls(self)
