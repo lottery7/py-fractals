@@ -1,15 +1,16 @@
 import json
-from math import cos, pi, sin
+from math import cos, exp, pi, pow, sin
 from typing import Any
 
 import OpenGL.GL as gl
 from PySide6.QtCore import QPointF
 
-from frontend.components import NamedSlider
+from frontend.components import AnimationParameterWidget, NamedSlider
 from util import use_setter
 
 from .abstract import (
     AAFractal,
+    AnimatedFractal,
     ColorableFractal,
     Fractal2D,
     IterableFractal,
@@ -17,12 +18,27 @@ from .abstract import (
 )
 
 
-class Julia2D(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, Fractal2D):
+class Julia2D(AnimatedFractal, StatefulFractal, AAFractal, IterableFractal, ColorableFractal, Fractal2D):
     def __init__(self, name: str, fragment_shader_path: str, *args, **kwargs):
         super().__init__(100, name, fragment_shader_path, *args, **kwargs)
 
         self._C_polar = QPointF(pi, 0.7)
         self._power = 2.0
+
+        self._anim_params = {
+            "arg_c": {
+                "fstep": lambda value, speed: value + speed,
+                "fspeed": lambda start, end, steps: (end - start) / steps,
+            },
+            "abs_c": {
+                "fstep": lambda value, speed: value + speed,
+                "fspeed": lambda start, end, steps: (end - start) / steps,
+            },
+            "zoom_factor": {
+                "fstep": lambda value, speed: value * speed,
+                "fspeed": lambda start, end, steps: pow(end / start, 1 / steps),
+            },
+        }
 
     @property
     def arg_c(self) -> float:
@@ -128,8 +144,33 @@ class Julia2D(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, Fra
             ]
         )
 
-    def motion_controls(self) -> list[Any]:
-        return []
+    def animation_controls(self) -> list[Any]:
+        return AnimatedFractal.animation_controls(self) + [
+            AnimationParameterWidget(
+                name="Arg(C)",
+                initial=0.1,
+                check_handlers=[lambda value: self._anim_params["arg_c"].__setitem__("use", value)],
+                start_handlers=[lambda value: self._anim_params["arg_c"].__setitem__("start", value)],
+                end_handlers=[lambda value: self._anim_params["arg_c"].__setitem__("end", value)],
+                step=0.1,
+            ),
+            AnimationParameterWidget(
+                name="Abs(C)",
+                initial=0.1,
+                check_handlers=[lambda value: self._anim_params["abs_c"].__setitem__("use", value)],
+                start_handlers=[lambda value: self._anim_params["abs_c"].__setitem__("start", value)],
+                end_handlers=[lambda value: self._anim_params["abs_c"].__setitem__("end", value)],
+                step=0.1,
+            ),
+            AnimationParameterWidget(
+                name="log(zoom_factor)",
+                initial=0.0,
+                check_handlers=[lambda value: self._anim_params["zoom_factor"].__setitem__("use", value)],
+                start_handlers=[lambda value: self._anim_params["zoom_factor"].__setitem__("start", exp(value))],
+                end_handlers=[lambda value: self._anim_params["zoom_factor"].__setitem__("end", exp(value))],
+                step=0.01,
+            ),
+        ]
 
     def paintGL(self) -> None:
         self.makeCurrent()

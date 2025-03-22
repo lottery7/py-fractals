@@ -15,6 +15,10 @@ class VStackWidget(QWidget):
     def add(self, widget: QWidget) -> None:
         self.layout().addWidget(widget)
 
+    def add_all(self, widgets: list[QWidget]) -> None:
+        for widget in widgets:
+            self.add(widget)
+
     def clear(self) -> None:
         while self.layout().count():
             item = self.layout().takeAt(0)

@@ -1,4 +1,5 @@
 from .AA_fractal import AAFractal
+from .animated_fractal import AnimatedFractal
 from .bg_colorable_fractal import BGColorableFractal
 from .colorable_fractal import ColorableFractal
 from .fractal_2d import Fractal2D
@@ -11,6 +12,7 @@ from .stateful_fractal import StatefulFractal
 
 __all__ = [
     "AAFractal",
+    "AnimatedFractal",
     "Fractal2D",
     "Fractal3D",
     "FractalABC",

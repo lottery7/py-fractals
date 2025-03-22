@@ -1,6 +1,7 @@
+import os
 from datetime import datetime
 
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QFileDialog
 
 from frontend.components import ColoredButton, NamedCheckBox
 from frontend.constants import get_color
@@ -36,9 +37,11 @@ class ScreenshotableFractal(FractalABC):
             ),
         ]
 
-    def _take_screenshot(self) -> str:
-        date = datetime.now().strftime("%m-%d-%Y_%H-%M-%S.jpg")
-        path = f"res/screenshots/{date}"
+    def _take_screenshot(self) -> None:
+        folder_path = QFileDialog.getExistingDirectory(self, "Choose folder")
+        date = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+        path = os.path.join(folder_path, f"{date}.jpg")
+
         old_size = self.size()
 
         if self.high_screenshot_quality:
@@ -50,20 +53,3 @@ class ScreenshotableFractal(FractalABC):
         scr.save(path, "jpg")
 
         self.resize(old_size)
-
-        dlg = QMessageBox(self)
-        dlg.setWindowTitle("Info")
-        dlg.setIcon(QMessageBox.Information)
-        dlg.setText("Screenshot Saved")
-        dlg.setDetailedText(f"Path: {path}")
-        dlg.setStyleSheet(
-            """QLabel {
-                min-height: 30px; 
-                max-height: 30px;
-                min-width: 300px; 
-                max-width: 300px;
-            }"""
-        )
-        dlg.exec()
-
-        return path

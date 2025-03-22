@@ -87,8 +87,8 @@ class BurningShip2D(StatefulFractal, AAFractal, IterableFractal, ColorableFracta
 
         self.update()
 
-    def motion_controls(self) -> list[Any]:
-        return super().motion_controls() + []
+    def animation_controls(self) -> list[Any]:
+        return super().animation_controls() + []
 
     def paintGL(self) -> None:
         self.makeCurrent()

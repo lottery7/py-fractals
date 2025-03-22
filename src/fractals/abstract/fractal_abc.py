@@ -25,7 +25,7 @@ class FractalABC(ABC, QOpenGLWidget, metaclass=_ABCQOpenGLWidgetMeta):
         pass
 
     @abstractmethod
-    def motion_controls(self) -> list[Any]:
+    def animation_controls(self) -> list[Any]:
         pass
 
     @abstractmethod

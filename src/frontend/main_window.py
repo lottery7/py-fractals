@@ -10,11 +10,10 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QSpacerItem,
     QTabWidget,
-    QVBoxLayout,
     QWidget,
 )
 
-from fractals.abstract.fractal_abc import FractalABC
+from fractals.abstract import FractalABC
 
 from .components import VStackWidget
 
@@ -35,7 +34,7 @@ class MainWindow(QMainWindow):
         self._create_fractal_tab()
         self._fractals = {}
 
-        self._create_motion_tab()
+        self._create_animation_tab()
 
         self._canvas_frame = QFrame()
         self._canvas_frame.setMinimumSize(QSize(480, 480))
@@ -68,14 +67,20 @@ class MainWindow(QMainWindow):
         self._fractal_controls.clear()
         self._fractal_controls.add(self._fractals_list)
 
-        for control in fractal.fractal_controls():
-            self._fractal_controls.add(control)
+        self._fractal_controls.add_all(fractal.fractal_controls())
 
         self._fractal_controls.layout().addItem(
             QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         )
 
         self._fractal_tab.verticalScrollBar().setValue(0)
+
+        self._animation_controls.clear()
+        self._animation_controls.add_all(fractal.animation_controls())
+
+        self._animation_controls.layout().addItem(
+            QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        )
 
         fractal.update()
 
@@ -95,17 +100,14 @@ class MainWindow(QMainWindow):
 
         self._tabs.addTab(self._fractal_tab, "Fractal")
 
-    def _create_motion_tab(self) -> None:
-        self._motion_controls = VStackWidget()
+    def _create_animation_tab(self) -> None:
+        self._animation_controls = VStackWidget()
 
-        tab_layout = QVBoxLayout()
-        tab_layout.addWidget(self._motion_controls)
-        tab_layout.addSpacerItem(QSpacerItem(0, 1, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        self._animation_tab = QScrollArea()
+        self._animation_tab.setWidgetResizable(True)
+        self._animation_tab.setWidget(self._animation_controls)
 
-        tab = QScrollArea()
-        tab.setWidget(self._motion_controls)
-
-        self._tabs.addTab(tab, "Motion")
+        self._tabs.addTab(self._animation_tab, "Animation")
 
     def _get_registered_fractals(self) -> list[FractalABC]:
         return [self._fractals_list.itemData(i) for i in range(self._fractals_list.count())]

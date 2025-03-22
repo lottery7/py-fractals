@@ -50,7 +50,7 @@ class Fractal3D(FragmentOnlyFractal, ScreenshotableFractal):
     def fractal_controls(self) -> list[Any]:
         return ScreenshotableFractal.fractal_controls(self)
 
-    def motion_controls(self) -> list[Any]:
+    def animation_controls(self) -> list[Any]:
         return []
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:

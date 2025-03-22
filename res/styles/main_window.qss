@@ -1,70 +1,118 @@
+/* General styles for the entire application */
 * {
     background-color: rgb(45, 45, 45);
     color: white;
     font: 10pt "Segoe UI Historic";
+    border: none; /* Remove default borders for custom control */
+    margin: 0;
+    padding: 0;
 }
 
+/* Styles for QComboBox, QPushButton, QSpinBox, QDoubleSpinBox, QLineEdit */
 QComboBox, QPushButton, QSpinBox, QDoubleSpinBox, QLineEdit {
-    background: rgb(33, 33, 33);
+    background-color: rgb(33, 33, 33);
+    border: 1px solid rgb(50, 50, 50); /* Add a thin border */
     border-radius: 4px;
-    min-height: 25px;
-    min-width: 150px;
-    padding-left: 7px;
+    min-height: 28px; /* Increase height for better readability */
+    min-width: 120px;
+    padding-left: 10px; /* Increase left padding for better appearance */
+    padding-right: 10px; /* Add right padding for balance */
 }
 
-QComboBox:hover, QPushButton:hover, QSpinBox:hover, QDoubleSpinBox:hover, QLineEdit:hover {	
+QComboBox:hover, QPushButton:hover, QSpinBox:hover, QDoubleSpinBox:hover, QLineEdit:hover { 
     background-color: rgb(56, 56, 56);
+    border: 1px solid rgb(66, 66, 66); /* Change border color on hover */
 }
 
 QComboBox:pressed, QPushButton:pressed, QSpinBox:pressed, QDoubleSpinBox:pressed, QLineEdit:pressed {
     background-color: rgb(50, 50, 50);
+    border: 1px solid rgb(72, 77, 82); /* Change border color on press */
 }
 
-QComboBox:drop-down, QSpinBox:down-button, QSpinBox:up-button, QDoubleSpinBox:down-button, QDoubleSpinBox:up-button {
-    width: 10px;
+/* Styles for disabled elements */
+QComboBox:disabled, QPushButton:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled, QLineEdit:disabled {
+    background-color: rgb(25, 25, 25); /* Darker background for disabled */
+    color: rgb(120, 120, 120); /* Grayed-out text color */
+    border: 1px solid rgb(60, 60, 60); /* Slightly darker border */
+}
+
+QLabel:disabled {
+    color: rgb(120, 120, 120);
+}
+
+/* Styles for dropdown buttons and spinbox buttons */
+QComboBox::drop-down, QSpinBox::down-button, QSpinBox::up-button, QDoubleSpinBox::down-button, QDoubleSpinBox::up-button {
+    width: 20px; /* Increase width for better visual perception */
     background-color: rgb(66, 66, 66);
+    border-left: 1px solid rgb(50, 50, 50); /* Add a separator border */
 }
 
-QSpinBox:down-button, QSpinBox:up-button, QDoubleSpinBox:down-button, QDoubleSpinBox:up-button { height: 12px; }
+QSpinBox::down-button, QSpinBox::up-button, QDoubleSpinBox::down-button, QDoubleSpinBox::up-button { 
+    height: 14px; /* Increase height for better visual perception */
+}
 
-QComboBox:drop-down:hover, QSpinBox:down-button:hover, QSpinBox:up-button:hover, QDoubleSpinBox:down-button:hover { background-color: rgb(72, 77, 82); }
+QComboBox::drop-down:hover, QSpinBox::down-button:hover, QSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover { 
+    background-color: rgb(72, 77, 82);
+}
 
-QScrollBar:vertical
-{
+/* Styles for vertical scrollbar */
+QScrollBar:vertical {
     background-color: #2A2929;
-    width: 15px;
-    margin: 15px 3px 15px 3px;
-    border: 1px transparent #2A2929;
-    border-radius: 4px;
+    width: 16px; /* Slightly increase width for better interaction */
+    margin: 16px 4px 16px 4px; /* Slightly increase margins */
+    border-radius: 6px; /* Increase radius for a smoother look */
 }
 
-QScrollBar::handle:vertical
-{
+QScrollBar::handle:vertical {
     background-color: rgb(96, 95, 95);
-    min-height: 5px;
-    border-radius: 4px;
+    min-height: 20px; /* Increase minimum height for better interaction */
+    border-radius: 6px;
 }
 
-QScrollBar::handle:vertical:hover
-{
+QScrollBar::handle:vertical:hover {
     background-color: rgb(86, 85, 85);
-    min-height: 5px;
-    border-radius: 4px;
+    min-height: 20px;
+    border-radius: 6px;
 }
 
-QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical:hover, QScrollBar::sub-line:vertical:on, QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on, QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on, QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
-{
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical:hover, QScrollBar::sub-line:vertical:on,
+QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on,
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical,
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     background: none;
 }
 
+/* Styles for QTabWidget */
 QTabWidget::pane { 
     position: absolute;
+    border: none; /* Remove default pane border */
 }
 
+/* Styles for QTabBar */
 QTabBar::tab:selected {
-    background-color:rgb(45, 45, 45);
+    background-color: rgb(45, 45, 45);
+    border-bottom: 2px solid rgb(100, 100, 100); /* Add an accent line at the bottom */
 }
 
 QTabBar::tab:!selected {
     background-color: rgb(33, 33, 33);
+}
+
+QTabBar::tab {
+    padding: 8px 15px; /* Increase padding for better appearance */
+}
+
+QTabBar::tab:hover {
+    background-color: rgb(56, 56, 56);
+}
+
+MotionParameterWidget {
+    background-color: #2B2B2B;
+}
+
+#motionParamWidgetFrame {
+    border: 1px solid #3A3A3A;
+    border-radius: 10px;
+    padding: 4px;
 }

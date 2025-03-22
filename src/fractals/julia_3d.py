@@ -178,7 +178,7 @@ class Julia3D(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, BGC
             ]
         )
 
-    def motion_controls(self) -> list[Any]:
+    def animation_controls(self) -> list[Any]:
         return []
 
     def paintGL(self) -> None:

@@ -318,7 +318,7 @@ class Mandelbox(StatefulFractal, AAFractal, IterableFractal, ColorableFractal, B
             ]
         )
 
-    def motion_controls(self) -> list[Any]:
+    def animation_controls(self) -> list[Any]:
         return []
 
     def _save_state(self, filename: str) -> None:
